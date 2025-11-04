@@ -84,7 +84,7 @@ mod tests {
     use axum::{body::Body, http::StatusCode};
     use hyper::Request;
     use tower::ServiceExt;
-    use http_body_util::BodyExt; // ✅ để dùng .collect()
+    use http_body_util::BodyExt;
 
     #[tokio::test]
     async fn test_health_check() {
@@ -99,15 +99,13 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::OK);
 
-        // ✅ Phần này là fix chính
         let body_bytes = response
-            .into_body() // lấy phần body ra
+            .into_body()
             .collect()
             .await
             .unwrap()
-            .to_bytes(); // chuyển sang bytes
+            .to_bytes();
 
-        // ✅ Giải mã JSON
         let json: Value = serde_json::from_slice(&body_bytes).unwrap();
 
         assert_eq!(json["status"], "ok");
